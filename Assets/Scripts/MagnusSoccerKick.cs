@@ -1,10 +1,11 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class MagnusSoccerKick : MonoBehaviour
 {
-    [SerializeField] float kickForce;
-    [SerializeField] float spinAmount;
-    [SerializeField] float magnusStrenght = 0.5f;
+    public float kickForce;
+    public float spinAmount;
+    public float magnusStrenght = 0.5f;
 
     Rigidbody rb;
     bool isShot = false;
@@ -18,6 +19,22 @@ public class MagnusSoccerKick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && !isShot)
+        {
+            rb.AddForce(Vector3.forward * kickForce, ForceMode.Impulse);
+
+            rb.AddTorque(Vector3.up * spinAmount);
+            isShot = true;
+        }
+    }
+    private void FixedUpdate()
+    {
+        if (isShot) return;
+        Vector3 velocity = rb.linearVelocity;
+        Vector3 spin = rb.angularVelocity;
+
+        Vector3 magnusForce = magnusStrenght * Vector3.Cross(spin, velocity);
+
+        rb.AddForce(magnusForce);
     }
 }
